@@ -92,6 +92,17 @@ services:
       - zenoh_network
     command: "/bin/bash -c \"sleep 5; while true; do curl -g -H 'Accept: text/event-stream' 'http://zenoh:8888/foo'; sleep 1; done\""
 
+  zenoh_mqtt:
+    image: eclipse/zenoh-bridge-mqtt:latest
+    env_file:
+      - .env
+    networks:
+      - zenoh_network
+    links:
+      - zenoh
+    ports:
+      - 8883:1883
+    command: "-e tcp/zenoh:7447 -m peer"
 
 networks:
   ros_network_1:
