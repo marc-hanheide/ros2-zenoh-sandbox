@@ -1,0 +1,4 @@
+FROM eclipse/zenoh-bridge-ros2dds:latest
+
+LABEL maintainer="LCAS <marc@hanheide.net>"
+

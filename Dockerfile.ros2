@@ -1,0 +1,28 @@
+FROM lcas.lincoln.ac.uk/lcas/ros:humble
+
+ENV DEBIAN_FRONTEND=noninteractive
+# Set up user account
+RUN useradd -ms /bin/bash ros && echo "ros:ros" | chpasswd && adduser ros sudo
+RUN adduser ros video
+# Builder dependencies installation
+
+RUN apt-get update \
+    && apt-get install -qq -y --no-install-recommends \
+    curl \
+    software-properties-common \
+    python3-pip \
+    python3 \
+    sudo \
+    ros-humble-cyclonedds \
+    ros-humble-rmw-cyclonedds-cpp \
+    python3-rosdep \
+    ros-humble-turtlebot4-tutorials \
+    && rm -rf /var/lib/apt/lists/*
+
+# add sudo without password
+RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+RUN echo "source /opt/ros/humble/setup.bash" >> /etc/bash.bashrc
+

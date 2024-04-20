@@ -1,0 +1,104 @@
+version: "3.8"
+services:
+  ### run a zenoh-bridge-ros2dds in server mode (as a peer), connected to the
+  ### ROS2 network number 1 (e.g. a robot) and to the zenoh network
+  ### enable REST API on port 8888 and zenoh on port 7447
+  zenoh:
+    build:
+      context: .
+      dockerfile: Dockerfile.zenoh
+    env_file:
+      - .env
+    networks:
+      - ros_network_1
+      - zenoh_network
+    ports:
+      - 7447:7447
+      - 34888:8888
+    volumes:
+      - ./cyclonedds.xml:/etc/cyclonedds/cyclonedds.xml:ro
+    command: "-l tcp/0.0.0.0:7447 -r 0.0.0.0:8888 -d 0 -m peer"
+
+  # run a second Zenoh ROS2 bridge that connects to the Zenoh network and the ROS2 network number 2
+  # it runs initiates the connection to the listening other bridge
+  zenoh_connect:
+    build:
+      context: .
+      dockerfile: Dockerfile.zenoh
+    env_file:
+      - .env
+    networks:
+      - ros_network_2
+      - zenoh_network
+    links:
+      - zenoh
+    depends_on:
+      - zenoh
+    volumes:
+      - ./cyclonedds.xml:/etc/cyclonedds/cyclonedds.xml:ro
+    command: "-e tcp/zenoh:7447 -d 0 -m peer"
+
+
+  ### run a ROS2 publisher on ROS2 network number 1, publishing on topic /foo
+  ### the zenoh bridge should pick this topic up and bridge it to Zenoh
+  ros2_publisher_1:
+    build:
+      context: .
+      dockerfile: Dockerfile.ros2
+    deploy:
+      replicas: 1
+    env_file:
+      - .env
+    networks:
+      - ros_network_1
+    user: ros
+    volumes:
+      - ./cyclonedds.xml:/etc/cyclonedds/cyclonedds.xml:ro
+    command: "/bin/bash -c 'ros2 topic pub /foo std_msgs/msg/String \"data: `hostname`\" -r 1'"
+
+  ### run a ROS2 subscriber on ROS2 network number 2 (not directly connected to the publisher above),
+  ### subscribing to topic /foo
+  ros2_subscriber_2:
+    build:
+      context: .
+      dockerfile: Dockerfile.ros2
+    deploy:
+      replicas: 1
+    env_file:
+      - .env
+    networks:
+      - ros_network_2
+    user: ros
+    volumes:
+      - ./cyclonedds.xml:/etc/cyclonedds/cyclonedds.xml:ro
+    command: "/bin/bash -c 'sleep 5; ros2 topic echo /foo'"
+
+  ### Test the REST API, by subscribing to the /foo topic via a simple curl SSE
+  ### Data from the /foo topic is send as SSE from the bridge
+  zenoh_rest_subscriber:
+    build:
+      context: .
+      dockerfile: Dockerfile.ros2
+    deploy:
+      replicas: 1
+    env_file:
+      - .env
+    links:
+      - zenoh
+    depends_on:
+      - zenoh
+    user: ros
+    networks:
+      - zenoh_network
+    command: "/bin/bash -c \"sleep 5; while true; do curl -g -H 'Accept: text/event-stream' 'http://zenoh:8888/foo'; sleep 1; done\""
+
+
+networks:
+  ros_network_1:
+    driver: bridge
+  ros_network_2:
+    driver: bridge
+  zenoh_network:
+    driver: bridge
+
+      

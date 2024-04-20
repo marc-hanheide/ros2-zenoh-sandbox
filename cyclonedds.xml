@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CycloneDDS xmlns="https://cdds.io/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
+    <Domain id="0">
+        <General>
+            <AllowMulticast>true</AllowMulticast>
+            <!-- <MaxMessageSize>10MB</MaxMessageSize>
+            <FragmentSize>10250B</FragmentSize> -->
+            <Transport>udp</Transport>
+        </General>
+        <!-- <Internal>
+            <Watermarks>
+                <WhcHigh>500kB</WhcHigh>
+            </Watermarks>
+            <>10MB</MinimumSocketReceiveBufferSize>
+            <SocketReceiveBufferSize min="10MB"/>
+        </Internal> -->
+        <Tracing>
+            <Verbosity>info</Verbosity>
+            <OutputFile>stdout</OutputFile>
+        </Tracing>
+    </Domain>
+</CycloneDDS>
