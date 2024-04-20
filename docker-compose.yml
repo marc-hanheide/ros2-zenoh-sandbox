@@ -79,8 +79,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ros2
-    deploy:
-      replicas: 1
     env_file:
       - .env
     links:

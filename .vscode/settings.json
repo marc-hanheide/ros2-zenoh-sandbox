@@ -1,0 +1,10 @@
+{
+    "vsmqtt.brokerProfiles": [
+        {
+            "name": "zenoh_mqtt",
+            "host": "localhost",
+            "port": 8883,
+            "clientId": "vsmqtt_client_a5e4"
+        }
+    ]
+}
