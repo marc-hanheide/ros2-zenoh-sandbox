@@ -46,7 +46,7 @@ services:
       context: .
       dockerfile: Dockerfile.ros2
     deploy:
-      replicas: 1
+      replicas: 3
     env_file:
       - .env
     networks:
@@ -54,7 +54,7 @@ services:
     user: ros
     volumes:
       - ./cyclonedds.xml:/etc/cyclonedds/cyclonedds.xml:ro
-    command: "/bin/bash -c 'ros2 topic pub /foo std_msgs/msg/String \"data: `hostname`\" -r 1'"
+    command: "/bin/bash -c 'ros2 topic pub /foo std_msgs/msg/String \"data: `hostname`\" -r 1 -p 0'"
 
   ### run a ROS2 subscriber on ROS2 network number 2 (not directly connected to the publisher above),
   ### subscribing to topic /foo
@@ -71,7 +71,7 @@ services:
     user: ros
     volumes:
       - ./cyclonedds.xml:/etc/cyclonedds/cyclonedds.xml:ro
-    command: "/bin/bash -c 'sleep 5; ros2 topic echo /foo'"
+    command: "/bin/bash -c 'sleep 5; ros2 topic hz /foo'"
 
   ### Test the REST API, by subscribing to the /foo topic via a simple curl SSE
   ### Data from the /foo topic is send as SSE from the bridge
@@ -100,5 +100,9 @@ networks:
     driver: bridge
   zenoh_network:
     driver: bridge
+    driver_opts:
+      # prefix the zenoh network with a different name the "eth", to avoid conflicts with the ROS2 network
+      # and to ensure the ROS DDS discovery works correctly only on the interface defined in cyclonedds.xml
+      com.docker.network.container_iface_prefix: "zenoh"
 
       
