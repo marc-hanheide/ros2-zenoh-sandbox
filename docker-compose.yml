@@ -73,6 +73,26 @@ services:
       - ./cyclonedds.xml:/etc/cyclonedds/cyclonedds.xml:ro
     command: "/bin/bash -c 'sleep 5; ros2 topic hz /foo'"
 
+  # ros1_subscriber:
+  #   image: ros:noetic
+  #   networks:
+  #     - zenoh_network
+  #   command: "/bin/bash -c 'source /opt/ros/noetic/setup.bash; (roscore &); sleep 3; while true; do rostopic list; sleep 1; done'"
+
+  # ros1_zenoh_bridge:
+  #   image: eclipse/zenoh-bridge-ros1:latest
+  #   networks:
+  #     - zenoh_network
+  #   links:
+  #     - zenoh
+  #     - ros1_subscriber
+  #   depends_on:
+  #     - zenoh
+  #     - ros1_subscriber
+  #   environment:
+  #     - ROS_MASTER_URI=http://ros1_subscriber:11311
+  #   command: "-e tcp/zenoh:7447 -m client --ros_namespace /ros1 --publisher_bridging_mode disabled --subscriber_bridging_mode disabled --service_bridging_mode disabled --subscriber_topic_custom_bridging_mode '{\"/foo\":\"lazy_auto\"}'"
+
   ### Test the REST API, by subscribing to the /foo topic via a simple curl SSE
   ### Data from the /foo topic is send as SSE from the bridge
   zenoh_rest_subscriber:
