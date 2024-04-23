@@ -47,3 +47,5 @@ ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 
 ENTRYPOINT [ "/ros_bridge_entrypoint.sh" ]
+USER ros
+CMD [ "bash", "-c", 'sleep 5; ros2 run ros1_bridge dynamic_bridge --bridge-all-topics' ]

@@ -4,6 +4,7 @@ services:
   ### ROS2 network number 1 (e.g. a robot) and to the zenoh network
   ### enable REST API on port 8888 and zenoh on port 7447
   zenoh:
+    image: lcas.lincoln.ac.uk/lcas/zenoh_ros2dds_bridge:latest
     build:
       context: .
       dockerfile: Dockerfile.zenoh
@@ -42,6 +43,7 @@ services:
   ### run a ROS2 publisher on ROS2 network number 1, publishing on topic /foo
   ### the zenoh bridge should pick this topic up and bridge it to Zenoh
   ros2_publisher:
+    image: lcas.lincoln.ac.uk/lcas/ros2_test:latest
     build:
       context: .
       dockerfile: Dockerfile.ros2
@@ -59,6 +61,7 @@ services:
   ### run a ROS2 subscriber on ROS2 network number 2 (not directly connected to the publisher above),
   ### subscribing to topic /foo
   ros2_subscriber:
+    image: lcas.lincoln.ac.uk/lcas/ros2_test:latest
     build:
       context: .
       dockerfile: Dockerfile.ros2
@@ -75,6 +78,7 @@ services:
     command: "/bin/bash -c 'sleep 5; ros2 topic hz /foo'"
 
   ros_bridge:
+    image: lcas.lincoln.ac.uk/lcas/ros1_bridge:latest
     build:
       context: .
       dockerfile: Dockerfile.ros_bridge
@@ -121,6 +125,7 @@ services:
   ### Test the REST API, by subscribing to the /foo topic via a simple curl SSE
   ### Data from the /foo topic is send as SSE from the bridge
   zenoh_rest_subscriber:
+    image: lcas.lincoln.ac.uk/lcas/ros2_test:latest
     build:
       context: .
       dockerfile: Dockerfile.ros2

@@ -26,3 +26,12 @@ ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 RUN echo "source /opt/ros/humble/setup.bash" >> /etc/bash.bashrc
 
+RUN mkdir -p /etc/cyclonedds
+COPY ./cyclonedds.xml /etc/cyclonedds/cyclonedds.xml
+ENV CYCLONEDDS_URI=file:///etc/cyclonedds/cyclonedds.xml
+ENV ROS_DOMAIN_ID=0
+ENV ROS_DISTRO=humble
+
+
+USER ros
+

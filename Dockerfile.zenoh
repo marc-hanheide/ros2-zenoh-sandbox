@@ -2,3 +2,11 @@ FROM eclipse/zenoh-bridge-ros2dds:latest
 
 LABEL maintainer="LCAS <marc@hanheide.net>"
 
+EXPOSE 7447
+EXPOSE 8888
+RUN mkdir -p /etc/cyclonedds
+COPY ./cyclonedds.xml /etc/cyclonedds/cyclonedds.xml
+ENV CYCLONEDDS_URI=file:///etc/cyclonedds/cyclonedds.xml
+ENV ROS_DOMAIN_ID=0
+ENV ROS_DISTRO=humble
+CMD ["-l", "tcp/0.0.0.0:7447", "-r 0.0.0.0:8888", "-d", "0", "-m peer"]
