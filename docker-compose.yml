@@ -41,7 +41,7 @@ services:
 
   ### run a ROS2 publisher on ROS2 network number 1, publishing on topic /foo
   ### the zenoh bridge should pick this topic up and bridge it to Zenoh
-  ros2_publisher_1:
+  ros2_publisher:
     build:
       context: .
       dockerfile: Dockerfile.ros2
@@ -58,7 +58,7 @@ services:
 
   ### run a ROS2 subscriber on ROS2 network number 2 (not directly connected to the publisher above),
   ### subscribing to topic /foo
-  ros2_subscriber_2:
+  ros2_subscriber:
     build:
       context: .
       dockerfile: Dockerfile.ros2
@@ -66,6 +66,7 @@ services:
       replicas: 1
     env_file:
       - .env
+    tty: true
     networks:
       - ros_network_2
     user: ros
@@ -73,12 +74,36 @@ services:
       - ./cyclonedds.xml:/etc/cyclonedds/cyclonedds.xml:ro
     command: "/bin/bash -c 'sleep 5; ros2 topic hz /foo'"
 
-  # ros1_subscriber:
-  #   image: ros:noetic
-  #   networks:
-  #     - zenoh_network
-  #   command: "/bin/bash -c 'source /opt/ros/noetic/setup.bash; (roscore &); sleep 3; while true; do rostopic list; sleep 1; done'"
+  ros_bridge:
+    build:
+      context: .
+      dockerfile: Dockerfile.ros_bridge
+    environment:
+      - CYCLONEDDS_URI=file:///etc/cyclonedds/cyclonedds.xml
+      - ROS_DOMAIN_ID=0
+      - ROS_MASTER_URI=http://localhost:11311
+    tty: true
+    networks:
+      - ros_network_2
+    user: ros
+    volumes:
+      - ./cyclonedds.xml:/etc/cyclonedds/cyclonedds.xml:ro
+    command: "/bin/bash -c 'sleep 5; ros2 run ros1_bridge dynamic_bridge --bridge-all-topics'"
 
+
+  ros1_subscriber:
+    image: ros:noetic
+    networks:
+      - ros_network_2
+    links:
+      - ros_bridge
+    tty: true
+    depends_on:
+      - ros_bridge
+    environment:
+      - ROS_MASTER_URI=http://ros_bridge:11311
+    #command: "/bin/bash -c 'source /opt/ros/noetic/setup.bash; (roscore &); sleep 3; while true; do rostopic list; sleep 1; done'"
+    command: "/bin/bash -c 'sleep 5; source /opt/ros/noetic/setup.bash; rostopic hz /foo'"
   # ros1_zenoh_bridge:
   #   image: eclipse/zenoh-bridge-ros1:latest
   #   networks:
