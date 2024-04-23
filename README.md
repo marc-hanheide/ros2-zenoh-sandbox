@@ -8,8 +8,15 @@ The main documentation is the actual [`docker-compose.yml`](./docker-compose.yml
 * Also on the `ros_network_2` runs a [ROS2-ROS1 bridge](https://github.com/ros2/ros1_bridge) (container `ros_bridge`), and a ROS1 subscriber (container `ros1_subscriber`), to test the ability to bridge to ROS1 containers. The `roscore` is being run as part of the `ros_bridge`
 * It also features a [Zenoh MQTT bridge](https://lib.rs/crates/zenoh-plugin-mqtt) (named: `zenoh_mqtt`), that connects to the `zenoh` container and acts as an MQTT broker, allowing MQTT clients to receive/publish any ROS topics
 
-
 ## Overview of the network setup and the protocols between different containers
 
 [![](http://interactive.blockdiag.com/nwdiag/image?compression=deflate&encoding=base64&src=eJyNks1qhDAUhfc-xSVru3A6MGLxGQrT5VCCSS4qtYlNItMffPdmkojSiVBXau4557tH5VX0TQs_GYBEe1X6DbQyNN7Twp8AfKNUHVwaITQaUxP-xQcl8UEIQ3IwXTNirdUkBQqmPl-fvMgZHeg4saE3HWrnldb76XkD4MMWhB0A_1ydjsdTDp21Y1W6i8TgYMCVlMhtUrQPHbRu3lIzMcN1z1BvPHbC3j-spUz3okW4BGuyeru4JPlNVRVl-XhfwvYrHGIJvtAk1V2f-yUkRltHOsYMgKFhOEAN5IYQViLxaH2zMTw_vxQ5_OuPCA5c6b_6hWRe9izSe66zc5bNvxAi5rA)](http://interactive.blockdiag.com/nwdiag/?compression=deflate&src=eJyNks1qhDAUhfc-xSVru3A6MGLxGQrT5VCCSS4qtYlNItMffPdmkojSiVBXau4557tH5VX0TQs_GYBEe1X6DbQyNN7Twp8AfKNUHVwaITQaUxP-xQcl8UEIQ3IwXTNirdUkBQqmPl-fvMgZHeg4saE3HWrnldb76XkD4MMWhB0A_1ydjsdTDp21Y1W6i8TgYMCVlMhtUrQPHbRu3lIzMcN1z1BvPHbC3j-spUz3okW4BGuyeru4JPlNVRVl-XhfwvYrHGIJvtAk1V2f-yUkRltHOsYMgKFhOEAN5IYQViLxaH2zMTw_vxQ5_OuPCA5c6b_6hWRe9izSe66zc5bNvxAi5rA)
 
+## Images used:
+```
+eclipse/zenoh-bridge-mqtt:latest
+lcas.lincoln.ac.uk/lcas/ros1_bridge:latest
+lcas.lincoln.ac.uk/lcas/ros2_test:latest
+lcas.lincoln.ac.uk/lcas/zenoh_ros2dds_bridge:latest
+ros:noetic
+```

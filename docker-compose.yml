@@ -23,6 +23,7 @@ services:
   # run a second Zenoh ROS2 bridge that connects to the Zenoh network and the ROS2 network number 2
   # it runs initiates the connection to the listening other bridge
   zenoh_connect:
+    image: lcas.lincoln.ac.uk/lcas/zenoh_ros2dds_bridge:latest
     build:
       context: .
       dockerfile: Dockerfile.zenoh
